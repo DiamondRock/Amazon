@@ -1,0 +1,15 @@
+#content
+{
+    text-align: center;
+}
+
+#loginFrame
+{
+    text-align: left;
+    display: inline-block;
+}
+
+button
+{
+    margin-right: 20%;
+}

@@ -1,0 +1,32 @@
+#content
+{
+    text-align: center;
+}
+
+#signupFrame
+{
+    text-align: left;
+    display: inline-block;
+}
+
+#error
+{
+    color: red;
+}
+
+#signupFrame label
+{
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+}
+
+.error
+{
+    color: red;
+}
+
+/*button*/
+/*{*/
+    /*margin-right: 20%;*/
+/*}*/

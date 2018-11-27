@@ -1,0 +1,48 @@
+#header
+{
+	background-color:black;
+	text-align: center;
+	vertical-align:middle;
+	color: grey;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+#header ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    float: left;
+}
+
+#header ul:last-of-type
+{
+    float:right;
+}
+
+#header li {
+    float: left;
+    border-right:1px solid #bbb;
+}
+
+#header li:last-child {
+    border-right: none;
+}
+
+#header li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#header li a:hover:not(.active) {
+    background-color: #111;
+}
+
+#header .active {
+    background-color: #4CAF50;
+}

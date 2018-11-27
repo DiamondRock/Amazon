@@ -1,0 +1,9 @@
+#footer
+{
+	background-color:grey;
+	text-align: center;
+	//display: flex;
+    justify-content:center;
+    align-content:center;
+    //flex-direction:column; /* column | row */
+}

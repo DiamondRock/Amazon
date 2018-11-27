@@ -1,0 +1,56 @@
+@import url("https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css");
+@import url("header.css");
+@import url("sideBar.css");
+@import url("footer.css");
+html
+{
+   //height: 100%;
+}
+
+body
+{
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	//grid-template-rows: 10% 80% 10%;
+	//height: 100%;
+}
+
+#header
+{
+	grid-column: span 12;
+}
+
+#sideBar
+{
+	grid-column: span 2;
+	//overflow:auto;
+	min-height: 645px;
+}
+
+#content
+{
+	grid-column: span 10;
+	//overflow: auto;
+	padding: 10px;
+	//display: block;
+}
+
+#footer
+{
+	grid-column: span 12;
+}
+
+
+#profPic
+{
+	float: left;
+	width:15%;
+	//height: 50%;
+	margin-right: 10px;
+}
+
+#profPic img
+{
+	
+}
+
