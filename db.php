@@ -71,4 +71,14 @@
         }
     }
 
+    function getLastInsertId($conn)
+    {
+        $query = "select last_insert_id()";
+        $params=[];
+        $paramsNamesInQuery=[];
+        $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
+        $result = $result->fetch(PDO::FETCH_BOTH);
+        return $result[0];
+    }
+
 ?>

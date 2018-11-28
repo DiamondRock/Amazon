@@ -1,0 +1,30 @@
+#content
+{
+    text-align: center;
+}
+
+table
+{
+    margin: 0 auto;
+}
+
+table img
+{
+    width: 100px;
+    height: 100px;
+}
+
+td, th
+{
+    padding: 10px;
+}
+
+.btn-delete
+{
+   //background-color: #ff6b62;
+}
+
+.btn-update
+{
+    //background-color: lightblue;
+}

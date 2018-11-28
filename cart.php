@@ -1,93 +1,92 @@
+<!DOCTYPE html>
 <?php
-session_start();
-if(!isset($_SESSION['username']))
+if (session_status() == PHP_SESSION_NONE)
 {
-	header("refresh:0;url=login.html");
-	die();
+    session_start();
 }
-if ($_SERVER['REQUEST_METHOD'] == 'GET') 
+if(!isset($_SESSION['userType']) || $_SESSION['userType'] != 'customer')
 {
-	$bookId = test_input($_GET['BookID']);	
-	$username = $_SESSION['username'];
-	$user = 'root';
-	$password = 'root';
-	$db = 'bookstore';
-	$host = 'localhost';
-	$port = 3306;
-
-	$conn = mysqli_connect(
-	   $host, 
-	   $user, 
-	   $password, 
-	   $db,
-	   $port
-	);
-
-
-	if (!$conn){
-
-		echo "Connection failed!";
-		exit;
-	}
-	?>
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<link rel="stylesheet" href="style/books.php.css">
-		</head>
-		<body>
-			<div id ="mainContent">
-	<?php
-	$query = "SELECT * FROM shoppingCart WHERE BookID=$bookId AND UserName='$username'";
-
-	$result = mysqli_query($conn, $query);
-	
-	if(mysqli_num_rows($result) > 0)
-	{
-		?>
-		<p> You have already added this book to your cart!</p>
-		<?php	
-	}
-	else
-	{
-		$query = "INSERT INTO shoppingCart VALUES('$username',$bookId)";
-		$result = mysqli_query($conn, $query);
-		if(!$result)
-		{
-			?>
-				<p>There was an error, we couldn't add the book to your cart. Please try again.</p>
-			<?php	
-		}
-	}
-	
-	$query = "SELECT DISTINCT BookTitle, ListPrice FROM BOOK, shoppingCart WHERE username='$username' and Book.BookID=shoppingCart.BookID";
-	$result = mysqli_query($conn, $query);
-	$totalPrice = 0;
-	echo "<table class='table table-striped'><tr><td>Book Title</td><td>List Price</td></tr>";
-	while($row = mysqli_fetch_array($result))
-	{
-		echo "<tr><td>". $row["BookTitle"] ."</td><td>". $row["ListPrice"]."</td></tr>";
-		$totalPrice += $row["ListPrice"];
-	}
-	mysqli_close();
-	?>
-	<tr><td colspan="100%">Total: <?php echo $totalPrice; ?></td></tr>
-	</table>
-				<a href = "books.php">Continue Shopping</a>
-				<br/>
-				<a href = "logout.php">Logout</a>
-			</div>
-		</body>
-	</html>
-<?php
+    die('Access denied!');
 }
-
-function test_input($data) 
-{
-	$data = trim($data);
-	$data = stripslashes($data);
-	$data = htmlspecialchars($data);
-	return $data;
-}
-
 ?>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Amazon</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="scripts/cart.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="styles/master.css"/>
+    <link rel="stylesheet" href="styles/cart.css"/>
+    <link rel="icon" type="image/png" href="images/diamond.jpg"/>
+</head>
+
+<body>
+<? include "header.php"; ?>
+<? include "sideBar.php"; ?>
+<div id = "content">
+    <?
+
+    require_once "connectDB.php";
+    if (isset($dbConnError))
+    {
+        die("Error in database. Please try again.");
+    }
+    $userId = $_SESSION['id'];
+    $query = "select distinct path as picturePath, name, price, quantity, p.id as id from shoppingCart as s, products as p, images as i  where s.userId=:userId and s.productId=p.id and i.id=p.pictureId";
+    $params = [$userId];
+    $paramsNamesInQuery = [":userId"];
+    $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
+    if($result->rowCount() == 0)
+    {
+        echo 'You have not added anything to your shopping cart yet';
+    }
+    else
+    {
+        $totalPrice = 0;
+        echo '<table id="items">';
+        echo "<tr><th></th><th>Name</th><th>Price</th><th>Quantity</th><th></th><th></th></tr>";
+        while ($row = $result->fetch(PDO::FETCH_BOTH))
+        {
+            $id = $row['id'];
+            $picturePath = $row['picturePath'];
+            $name = $row['name'];
+            $price = $row['price'];
+            $quantity = $row['quantity'];
+            $totalPrice += floatval($price) * floatval($quantity);
+            echo "<tr id='$id'>";
+            echo "<td>" . "<img src=\"{$picturePath}\"/" ."</td>";
+            echo "<td>" . $name ."</td>";
+            echo "<td>" . $price ."</td>";
+
+            echo "<td><select>";
+            echo "<option value='$quantity' selected='selected'>$quantity</option>";
+            for($i=1; $i < 20;$i++)
+            {
+                if ($i == $quantity)
+                    continue;
+                echo "<option value='$i'>$i</option>";
+            }
+            echo "</select></td>";
+            echo "<td><button class='btn btn-update'>Update</button></td>";
+            echo "<td><button class='btn btn-delete fa fa-trash'></button></td>";
+            echo "</tr>";
+        }
+        echo "<tr><td style='font-weight: bold' id='totalPrice'>Total price: $totalPrice</td></tr>";
+        echo "</table>";
+        ?>
+        <a href="placeOrder.php" class="btn btn-primary" id="placeOrder">Place the order!</a>
+        <?
+    }
+    ?>
+</div>
+<? include "footer.php"; ?>
+</body>
+</html>
+
+

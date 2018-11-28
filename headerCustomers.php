@@ -18,6 +18,9 @@ if(!isset($_SESSION['userType']) || strcmp($_SESSION['userType'], "customer")!=0
     </ul>
     <ul>
         <li>
+            <a href="cart.php">Cart</a>
+        </li>
+        <li>
             <a href="logout.php">Log out</a>
         </li>
     </ul>

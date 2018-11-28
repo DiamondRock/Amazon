@@ -1,4 +1,6 @@
 <?php
+
+	die(password_hash("Subah080197!", PASSWORD_BCRYPT));
 	//echo "x";
 	//echo "y";
 	$handle = fopen("originalPasswords.txt", "r");
