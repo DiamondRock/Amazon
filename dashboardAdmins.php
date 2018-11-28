@@ -1,3 +1,4 @@
+<?header ("location: products.php");?>
 <!DOCTYPE html>
 <?php
 	if (session_status() == PHP_SESSION_NONE)
@@ -8,36 +9,6 @@
 	{
 		die('Access denied!');
 	}
-?>
-<?php
-	if (session_status() == PHP_SESSION_NONE)
-	{
-		session_start();
-	}
-	if(!isset($_SESSION['userName']))
-	{
-		header ('location: index.php');
-	}
-	if($_SESSION['userType'] == 'customer')
-	{
-		header ("location: dashboardCustomers.php");
-	}
-	$reportError = "";
-	if(!empty($_POST['startDate']) || !empty($_POST['reportType']))
-    {
-		if(empty($_POST['startDate']))
-		{
-			$reportError = "The start date field is empty";
-		}
-		else if(empty($_POST['reportType']))
-		{
-			$reportError = "You should specify the report type";
-		}
-		else
-		{
-			include ("report.php");
-		}
-    }
 ?>
 <html lang="en">
 

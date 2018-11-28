@@ -15,8 +15,11 @@
 			<a href="dashboardAdmins.php">Dashboard</a>
 		</li>
 		<li>
-			<a href="aboutUs.html">About Us</a>
+			<a href="addProduct.php">Add New Product</a>
 		</li>
+        <li>
+            <a href="orderHistory.php">Order History</a>
+        </li>
 		<li>
 			<a href="contactUs.html">Contact Us</a>
 		</li>

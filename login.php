@@ -89,7 +89,15 @@
                     $found = userPassFoundInDBAndSetSessionVars($conn, $username, $password, $loginError);
                     if ($found)
                     {
-                        header("location: dashboardCustomers.php");
+                        if($_SESSION['userType'] == 'admin')
+                        {
+                            header("location: dashboardAdmins.php");
+                        }
+                        else
+                        {
+                            header("location: dashboardCustomers.php");
+                        }
+
                     }
                 }
             }

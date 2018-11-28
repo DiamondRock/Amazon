@@ -15,19 +15,10 @@
 			<a href="dashboardCustomers.php">Dashboard</a>
 		</li>
 		<li>
-			<a href="customersBuyOil.php">Buy Oil</a>
+			<a href="aboutUs.php">About Us</a>
 		</li>
 		<li>
-			<a href="customersSellOil.php">Sell Oil</a>
-		</li>
-		<li>
-			<a href="aboutUs.html">About Us</a>
-		</li>
-		<li>
-			<a href="contactUs.html">Contact Us</a>
-		</li>
-		<li>
-			<a href="logOut.php">Log Out</a>
+			<a href="contactUs.php">Contact Us</a>
 		</li>
 	</ul>
 </div>
