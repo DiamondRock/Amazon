@@ -1,4 +1,8 @@
 <?php
+if (session_status() == PHP_SESSION_NONE)
+{
+    session_start();
+}
 if(isset($_SESSION['userType']))
 {
     if(strcmp($_SESSION['userType'], "admin") == 0)
@@ -102,10 +106,8 @@ function writeToDB($conn, $firstName, $lastName, $emails, $password, $phoneNos, 
 {
     try
     {
-        $command = "SET autocommit=0;";
-        $conn->exec($command);
-        $command = "START TRANSACTION";
-        $conn->exec($command);
+        $conn->exec("SET autocommit=0;");
+        $conn->beginTransaction();
 
 
         $query = "insert into users(username, password, firstName, lastName, userType) values (:username, :password,
@@ -114,9 +116,9 @@ function writeToDB($conn, $firstName, $lastName, $emails, $password, $phoneNos, 
         $params = [$username, $hashedPassword, $firstName, $lastName];
         $paramsNamesInQuery = [":username", ":password", ":firstName", ":lastName"];
         executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
-        $userId = getLastInsertId($conn);
+        $userId = $conn->lastInsertId();
 
-        $query = "insert into emails(userId, email) values ({$userId}, :email)";
+        $query = "insert into emails(userId, email) values ($userId, :email)";
         $paramsNamesInQuery = [":email"];
         for($i = 0; $i < count($emails); $i++)
         {
@@ -124,7 +126,7 @@ function writeToDB($conn, $firstName, $lastName, $emails, $password, $phoneNos, 
             executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
         }
 
-        $query = "insert into phones(userId, phoneNo) values ({$userId}, :phoneNo)";
+        $query = "insert into phones(userId, phoneNo) values ($userId, :phoneNo)";
         $paramsNamesInQuery = [":phoneNo"];
         for($i = 0; $i < count($phoneNos); $i++)
         {
@@ -149,29 +151,16 @@ function writeToDB($conn, $firstName, $lastName, $emails, $password, $phoneNos, 
 //                true);
 //        }
 
-        $command = "COMMIT";
-        $conn->exec($command);
+        $conn->commit();
         return true;
     }
     catch (Exception $e)
     {
-        $command = "ROLLBACK";
-        $conn->exec($command);
+        $conn->rollBack();
         echo $e->getMessage();
         return false;
     }
 }
-
-function getLastInsertId($conn)
-{
-    $query = "select last_insert_id()";
-    $params=[];
-    $paramsNamesInQuery=[];
-    $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
-    $result = $result->fetch(PDO::FETCH_BOTH);
-    return $result[0];
-}
-
 
 function validate($firstName, $lastName, $emails, $password, $passwordConfirmation, $phoneNos, $termsChecked,
                   &$firstNameError="", &$lastNameError="", &$emailsErrors=[], &$passError="",
@@ -368,7 +357,7 @@ if($_SERVER["REQUEST_METHOD"] != "POST")
     Please fill in this form to create an account
     <hr/>
     <div id="error"></div>
-    <form id="form" action="register2.php" method="post">
+    <form id="form" action="register.php" method="post">
         <div id="signupFrame">
             <label for="username"><b>Username</b></label><br/>
             <input type="text" id="username" name="username" placeholder="Username" required="required"/>
@@ -408,7 +397,7 @@ else
         $error = "There was a problem with our database. Please try again.";
         if(!$noErrorFound)
         {
-            $error .= "Please also resolve the highlighted errors.";
+            $error .= "Please also resolve the highlighted errreors.";
         }
     }
     else
@@ -431,7 +420,7 @@ else
         Please fill in this form to create an account
         <hr/>
         <div id="error"><? echo $error; ?></div>
-        <form id="form" action="register2.php" method="post">
+        <form id="form" action="register.php" method="post">
             <label for="username"><b>Username</b></label><br/>
             <input type="text" id="username" name="username" placeholder="User name" required="required" value="<?if(!empty($username)){echo $username;}?>"/>
             <span id="usernameErrorSpan"><?if(!empty($usernameError)){echo $usernameError;}?></span><br/>

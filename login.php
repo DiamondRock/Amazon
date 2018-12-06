@@ -17,16 +17,9 @@
             {
                 $result = $result->fetch(PDO::FETCH_BOTH);
                 $hashedPassword = $result['password'];
-                echo password_hash($password, PASSWORD_BCRYPT)."\n";
-                if(password_hash($password, PASSWORD_BCRYPT) == $hashedPassword)
-                {
-                    echo "It's the same!";
-                }
 
                 if(!password_verify($password, $hashedPassword))
                 {
-                    echo "Password not verified\n$hashedPassword";
-                    echo "\n$2y$10\$DXq3XazHeMIypPp8Gy6Uxu7brKcE9.6Sd";
                     $loginError = "username and/or password are wrong";
                     return false;
                 }
@@ -101,7 +94,8 @@
                     }
                 }
             }
-        } else
+        }
+        else
         {
             $loginError = "Username and password fields are empty.";
         }

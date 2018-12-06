@@ -1,10 +1,17 @@
 $(document).ready(() => {
-    $("input.btn-delete").click(function (event) {
+    $(".product_wrapper a").click(function(event)
+    {
+        if ($(event.target).is('.btn-delete'))
+        {
+            event.preventDefault();
+        }
+    });
+    $("p.btn-delete").click(function (event) {
         let productId= $(this).parent().attr('id');
         var request = $.ajax({
             async: true,
             url: "deleteFromProducts.php",
-            type: "GET",
+            type: "POST",
             data: {
                 productId: productId,
             },
@@ -13,7 +20,7 @@ $(document).ready(() => {
                 if("successful" in data && data.successful == true)
                 {
                     alert("The item was successfully removed!");
-                    $(this).parent().parent().remove();
+                    $(this).closest(".product_wrapper").remove();
                 }
                 else
                 {

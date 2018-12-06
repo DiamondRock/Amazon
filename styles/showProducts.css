@@ -1,3 +1,7 @@
+#content
+{
+	text-align: center;
+}
 h1{
 	font-size:60px;
 	padding: 30px 20px 30px 20px;
@@ -9,8 +13,10 @@ h1{
 	padding: 30px 20px 30px 20px;
 	text-align: center;
 	width: 300px;
-	height: 550px;
+	height: 350px;
 	//max-width: 300px;
+	/*text-decoration: none;*/
+	color: black;
 	}
 .product_wrapper:hover {
 	box-shadow: 0 0 0 2px #e5e5e5;
@@ -20,15 +26,28 @@ h1{
 	font-weight:bold;
 	padding: 30px 20px 10px 20px;
 	font-size:18px;
+	max-height: 100px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 	}
-	
-img {
+
+.product_wrapper .image {
 	height: 130px;
 	width: 170px;
-	}
+	text-align: center;
+}
+	
+.product_wrapper .image img
+{
+	max-height: 130px;
+	max-width: 170px;
+	display: inline-block;
+	text-align: left;
+}
 	
 .product_wrapper .updateButton{
-	padding: 50px 50px 50px 50px;
+	padding: 25px 25px 25px 25px;
 }
 
 #btnUpdate{
@@ -37,11 +56,56 @@ img {
 
 .product_wrapper .deleteButton{
 	width: 100%;
-	padding: 50px;
+	padding: 25px;
 }
 
 #btnDelete{
 	width: 100%;
 }
 
+.product_wrapper a
+{
+	text-decoration: none;
+	color: black;
+}
+
+#paginationDiv
+{
+	display:inline-block;
+	text-align: center;
+	/*float: none;*/
+}
+
+.pagination{
+	margin:0;
+	padding:0;
+}
+.pagination li{
+	display: inline;
+	padding: 6px 10px 6px 10px;
+	border: 1px solid #ddd;
+	margin-right: -1px;
+	font: 20px/20px Arial, Helvetica, sans-serif;
+	background: #000000;
+}
+.pagination li a{
+	text-decoration:none;
+	color: rgb(122, 122, 122);
+}
+.pagination li.first {
+	border-radius: 5px 0px 0px 5px;
+}
+.pagination li.last {
+	border-radius: 0px 5px 5px 0px;
+}
+.pagination li:hover{
+	background: #EEE;
+}
+
+.pagination li.active
+{
+	background: #000000;
+	border: 1px solid #89B3CC;
+	color: #ff6b62;
+}
 

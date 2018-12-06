@@ -1,6 +1,6 @@
-body 
+#content
 {
-	font-family:Arial, Sans-Serif;
+	text-align: center;
 }
 
 #form_head{
@@ -59,24 +59,6 @@ input[type='text']
 	padding: 0px;
 }
 
-input[type='submit']
-{
-	padding: 10px 25px 8px; 
-	color: #fff; 
-	background-color: #0067ab; 
-	text-shadow: rgba(0,0,0,0.24) 0 1px 0; 
-	font-size: 16px; 
-	box-shadow: rgba(255,255,255,0.24) 0 2px 0 0 inset,#fff 0 1px 0 0; 
-	border: 1px solid #0164a5; 
-	border-radius: 2px; 
-	margin-top: 10px; 
-	cursor:pointer;
-}
-
-input[type='submit']:hover 
-{
-	background-color: #024978;
-}
 
 
 
@@ -121,6 +103,11 @@ input[type='submit']:hover
 
 #form_body_right{
 	padding: 0% 12% 10% 5%;
+}
+
+label
+{
+	font-weight: bold;
 }
 
 

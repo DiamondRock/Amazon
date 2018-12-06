@@ -84,14 +84,16 @@ function validateUsername()
     }
     else
     {
-        var request = $.ajax({
+        console.log("something");
+        let request = $.ajax({
             async: false,
             url: "existsInDB.php",
             type: "GET",
             data: {username: username}
+
         });
         request.done((data) => {
-            if(data == 'true')
+            if(data.successful == true && data.exists == true)
             {
                 error = "Username has already been taken. Please use another one!";
             }
@@ -120,6 +122,8 @@ function validateFirstName()
         firstNameIsValid = true;
         validate();
     }
+	if(!firstNameIsValid)
+	alert('last first ');
     return firstNameIsValid;
 }
 
@@ -150,20 +154,20 @@ function validateEmail()
     {
         error = "Email cannot be empty";
     }
-    else if(new RegExp('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,63}$').exec(email) == null)
+    else if(new RegExp('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$').exec(email) == null)
     {
         error = "Email is invalid";
     }
     else
     {
-        var request = $.ajax({
+        let request = $.ajax({
             async:false,
             url: "existsInDB.php",
             type: "GET",
             data: {email: email}
         });
         request.done((data) => {
-            if(data == 'true')
+            if(data.successful == true && data.exists == true)
             {
                 error = "This email has already been used for another account!";
             }
@@ -236,6 +240,10 @@ function validatePassword()
     if(!passwordsMatch())
     {
         $("#passwordConfirmationErrorSpan").html("Passwords do not match.");
+    }
+    else
+    {
+        $("#passwordConfirmationErrorSpan").html("");
     }
     if(error == "")
     {

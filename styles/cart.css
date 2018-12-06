@@ -8,10 +8,15 @@ table
     margin: 0 auto;
 }
 
-table img
+table .image
 {
     width: 100px;
-    height: 100px;
+    height: 150px;
+}
+table img
+{
+    max-width: 100px;
+    max-height: 150px;
 }
 
 td, th

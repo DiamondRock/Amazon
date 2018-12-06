@@ -1,8 +1,8 @@
 <?php
-    function connectToDB($host, $port, $username, $password, $dbName)
+    function connectToDB($host, $port, $username, $password, $dbName, $charset="utf8")
     {
         $conn = new PDO("mysql:host=$host;dbname=$dbName;port=$port", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);      
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION, "SET NAMES '$charset'");
         return $conn;
     }
 
@@ -17,13 +17,13 @@
      * @throws Exception if there is a problem in stmt preparation, binding, or execute or when there is a problem with
      * $params or $paramsNamesInQuery
      */
-    function executeQuery($conn, $query, $params, $paramsNamesInQuery, $queryIsUpdateOrInsert = true)
+    function executeQuery($conn, $query, $params, $paramsNamesInQuery, $queryIsUpdateOrInsert=true, $driverOptions=[])
     {
         if(count($params) != count($paramsNamesInQuery))
         {
             throw new Exception("The sizes of \$params and \$paramsNamesInQuery are not the same");
         }
-        $stmt = $conn->prepare($query);
+        $stmt = $conn->prepare($query, $driverOptions);
         for ($i = 0; $i < count($params); $i++)
         {
             if(strlen($paramsNamesInQuery[$i])==0 || $paramsNamesInQuery[$i][0]!=":")
@@ -81,4 +81,27 @@
         return $result[0];
     }
 
+    function fetchNRows($stmt, $n, $offset, $fetchStyle=PDO::FETCH_BOTH)
+    {
+        if($n < 1 || $offset < 0)
+        {
+            throw new Exception("n or offset error");
+        }
+        $result = [];
+        $counter = 0;
+        while($row = $stmt->fetch($fetchStyle))
+        {
+            if($counter == $offset)
+            {
+                $result[] = $row;
+                break;
+            }
+            $counter++;
+        }
+        while(($row = $stmt->fetch($fetchStyle)) && sizeof($result) < $n)
+        {
+            $result[] = $row;
+        }
+        return $result;
+    }
 ?>

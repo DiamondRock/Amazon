@@ -5,7 +5,7 @@ $(document).ready(() => {
         var request = $.ajax({
             async: true,
             url: "updateCart.php",
-            type: "GET",
+            type: "POST",
             data: {
                 productId: productId,
                 selectedQuantity: selectedQuantity
@@ -34,7 +34,7 @@ $(document).ready(() => {
         var request = $.ajax({
             async: true,
             url: "deleteItemFromCart.php",
-            type: "GET",
+            type: "POST",
             data: {
                 productId: productId,
                 selectedQuantity: selectedQuantity

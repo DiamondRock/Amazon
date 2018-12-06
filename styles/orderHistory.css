@@ -1,0 +1,36 @@
+#content
+{
+    text-align: center;
+}
+
+.table
+{
+    margin: 0 auto;
+    width: 80%;
+}
+
+td, th
+{
+    padding: 10px;
+}
+
+thead
+{
+    background-color: #a0b0b6;
+}
+
+#orders button
+{
+    background-color: #d3d3d3;
+}
+
+#orders button a
+{
+    color: black;
+    text-decoration: none;
+}
+
+#orders tbody tr
+{
+    cursor: pointer;
+}

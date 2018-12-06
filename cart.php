@@ -1,12 +1,52 @@
 <!DOCTYPE html>
 <?php
-if (session_status() == PHP_SESSION_NONE)
-{
-    session_start();
-}
-if(!isset($_SESSION['userType']) || $_SESSION['userType'] != 'customer')
+include "authentication.php";
+if(!authenticateUser("customer"))
 {
     die('Access denied!');
+}
+include "master.php";
+$userId = $_SESSION['id'];
+require_once "connectDB.php";
+if(!isset($dbConnError) && $_SERVER['REQUEST_METHOD'] == 'POST')
+{
+    $insertError = "";
+    try
+    {
+        $conn->exec("set autocommit=0");
+        $conn->beginTransaction();
+        $productId = $_POST['id'];
+        $quantity = $_POST['quantity'];
+        $query = "select supplies from products where id=:productId and deleted=0";
+        $params = [$productId];
+        $paramsNamesInQuery = [":productId"];
+        $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
+        $result = $result->fetch(PDO::FETCH_NUM);
+        if(empty($result))
+        {
+            $insertError = "Item not found.";
+            throw new Exception($insertError);
+        }
+        if($result[0] < $quantity)
+        {
+            $insertError = "Not enough supplies in stock.";
+            throw new Exception($insertError);
+        }
+        $query = "insert into shoppingCart (userId, productId, quantity) values($userId, :productId, :quantity)";
+        $params = [$productId, $quantity];
+        $paramsNamesInQuery = [":productId", ":quantity"];
+        $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
+        $conn->commit();
+    }
+    catch(Exception $e)
+    {
+        if(empty($insertError))
+        {
+            $insertError = "database error. Please try again.";
+        }
+        echo $e->getMessage();
+        $conn->rollBack();
+    }
 }
 ?>
 
@@ -31,62 +71,81 @@ if(!isset($_SESSION['userType']) || $_SESSION['userType'] != 'customer')
 <? include "sideBar.php"; ?>
 <div id = "content">
     <?
-
-    require_once "connectDB.php";
     if (isset($dbConnError))
     {
-        die("Error in database. Please try again.");
-    }
-    $userId = $_SESSION['id'];
-    $query = "select distinct path as picturePath, name, price, quantity, p.id as id from shoppingCart as s, products as p, images as i  where s.userId=:userId and s.productId=p.id and i.id=p.pictureId";
-    $params = [$userId];
-    $paramsNamesInQuery = [":userId"];
-    $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
-    if($result->rowCount() == 0)
-    {
-        echo 'You have not added anything to your shopping cart yet';
+        echo "Error in database. Please try again.";
     }
     else
     {
-        $totalPrice = 0;
-        echo '<table id="items">';
-        echo "<tr><th></th><th>Name</th><th>Price</th><th>Quantity</th><th></th><th></th></tr>";
-        while ($row = $result->fetch(PDO::FETCH_BOTH))
+        if(isset($insertError))
         {
-            $id = $row['id'];
-            $picturePath = $row['picturePath'];
-            $name = $row['name'];
-            $price = $row['price'];
-            $quantity = $row['quantity'];
-            $totalPrice += floatval($price) * floatval($quantity);
-            echo "<tr id='$id'>";
-            echo "<td>" . "<img src=\"{$picturePath}\"/" ."</td>";
-            echo "<td>" . $name ."</td>";
-            echo "<td>" . $price ."</td>";
-
-            echo "<td><select>";
-            echo "<option value='$quantity' selected='selected'>$quantity</option>";
-            for($i=1; $i < 20;$i++)
+            echo '<div id="insertMessage">';
+            if(empty($insertError))
             {
-                if ($i == $quantity)
-                    continue;
-                echo "<option value='$i'>$i</option>";
+                echo "The item was successfully added to your cart.";
             }
-            echo "</select></td>";
-            echo "<td><button class='btn btn-update'>Update</button></td>";
-            echo "<td><button class='btn btn-delete fa fa-trash'></button></td>";
-            echo "</tr>";
+            else
+            {
+                echo $insertError;
+            }
+            echo "</div>";
         }
-        echo "<tr><td style='font-weight: bold' id='totalPrice'>Total price: $totalPrice</td></tr>";
-        echo "</table>";
-        ?>
-        <a href="placeOrder.php" class="btn btn-primary" id="placeOrder">Place the order!</a>
-        <?
+        try
+        {
+            $query = "select quantity, p.id as id, name, price, supplies, path as picturePath from shoppingCart as s left join products as p on s.productId=p.id left join images as i on i.id=p.pictureId where s.userId=$userId";
+            $result = executeQuery($conn, $query, [], [], false);
+            if($result->rowCount() == 0)
+            {
+                echo 'You have not added anything to your shopping cart yet';
+            }
+            else
+            {
+                $totalPrice = 0;
+                echo '<table id="items">';
+                echo "<tr><th></th><th>Name</th><th>Price</th><th>Quantity</th><th></th><th></th></tr>";
+                while ($row = $result->fetch(PDO::FETCH_BOTH)) {
+                    $quantity = $row['quantity'];
+                    $id = $row['id'];
+                    $name = $row['name'];
+                    $price = $row['price'];
+                    $supplies = $row['supplies'];
+                    $picturePath = $row['picturePath'];
+                    if (empty($picturePath))
+                    {
+                        $picturePath = $GLOBALS["noImageAvailablePath"];
+                    }
+                    $totalPrice += floatval($price) * floatval($quantity);
+                    echo "<tr id='$id'>";
+                    echo "<td class='image'>" . "<img src=\"{$picturePath}\"/" . "</td>";
+                    echo "<td title=\"$name\">" . $name . "</td>";
+                    echo "<td>" . $price . "</td>";
+                    echo "<td><select>";
+                    echo "<option value='$quantity' selected='selected'>$quantity</option>";
+                    for ($i = 1; $i <= min(20, $supplies); $i++)
+                    {
+                        if ($i == $quantity)
+                            continue;
+                        echo "<option value='$i'>$i</option>";
+                    }
+                    echo "</select></td>";
+                    echo "<td><button class='btn btn-update'>Update</button></td>";
+                    echo "<td><button class='btn btn-delete fa fa-trash'></button></td>";
+                    echo "</tr>";
+                }
+                echo "<tr><td style='font-weight: bold' id='totalPrice'>Total price: $totalPrice</td></tr>";
+                echo "</table>";
+                ?>
+                <a href="placeOrder.php" class="btn btn-primary" id="placeOrder">Place the order!</a>
+                <?
+            }
+        }
+        catch(Exception $e)
+        {
+            echo "Error in database. Please try again.";
+        }
     }
     ?>
 </div>
 <? include "footer.php"; ?>
 </body>
 </html>
-
-

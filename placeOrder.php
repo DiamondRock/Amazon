@@ -1,32 +1,24 @@
 <!DOCTYPE html>
 <?php
-$taxPercentage = 8.25;
-if (session_status() == PHP_SESSION_NONE)
-{
-    session_start();
-}
-if(!isset($_SESSION['userType']) || $_SESSION['userType'] != 'customer')
+include "authentication.php";
+if(!authenticateUser("customer"))
 {
     die('Access denied!');
 }
+$taxPercentage = 8.25;
 try
 {
     require_once "connectDB.php";
     $userId = $_SESSION['id'];
-    $command = "SET autocommit=0;";
-    $conn->exec($command);
-    $command = "START TRANSACTION";
-    $conn->exec($command);
-    //orderId	productId	quantity	totalPrice;
+    $conn->exec("SET autocommit=0;");
+    $conn->beginTransaction();
     $date = date('Y-m-d H:i:s');
     $query = "insert into orders(userId , dateTime, totalPriceBeforeTax, tax) values($userId, '$date', 0, 0)";
-    $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
-    $orderId = getLastInsertId($conn);
+    $result = executeQuery($conn, $query, [], [], true);
+    $orderId = $conn->lastInsertId();
 
-    $query = "select name, productId, quantity, price, supplies from shoppingCart, products where userId=:userId and productId=products.id";
-    $params = [$userId];
-    $paramsNamesInQuery = [":userId"];
-    $result = executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
+    $query = "select name, productId, quantity, price, supplies from shoppingCart, products where userId=$userId and productId=products.id";
+    $result = executeQuery($conn, $query, [], [], false);
     $totalOrderPrice = 0;
     while ($row = $result->fetch(PDO::FETCH_BOTH))
     {
@@ -48,37 +40,25 @@ try
 
 
         $query = "insert into orders_products(orderId, productId, quantity, totalPrice) values($orderId, $productId, $quantity, $totalItemPrice)";
-        $params = [];
-        $paramsNamesInQuery = [];
-        executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
+        executeQuery($conn, $query, [], [], true);
 
-        $query = "delete from shoppingCart where userId=:userId and productId=$productId";
-        $params = [$userId];
-        $paramsNamesInQuery = [":userId"];
-        executeQuery($conn, $query, $params, $paramsNamesInQuery, false);
+        $query = "delete from shoppingCart where userId=$userId and productId=$productId";
+        executeQuery($conn, $query, [], [], false);
 
         $supplies -= $quantity;
         $query = "update products set supplies=$supplies where id=$productId";
-        $params = [];
-        $paramsNamesInQuery = [];
-        executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
+        executeQuery($conn, $query, [], [], true);
     }
 
     $tax = $totalOrderPrice * $taxPercentage / 100;
     $query = "update orders set totalPriceBeforeTax=$totalOrderPrice, tax=$tax where orderId=$orderId";
-    $params = [];
-    $paramsNamesInQuery = [];
-    executeQuery($conn, $query, $params, $paramsNamesInQuery, true);
+    executeQuery($conn, $query, [], [], true);
 
-
-
-    $command = "COMMIT";
-    $conn->exec($command);
+    $conn->commit();
 }
 catch (Exception $e)
 {
-    $command = "ROLLBACK";
-    $conn->exec($command);
+    $conn->rollBack();
     echo $e->getMessage();
     $error = "There was an error placing your order. Please try again.";
 }
@@ -93,7 +73,6 @@ catch (Exception $e)
 
     <title>Amazon</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"/>
     <link rel="stylesheet" href="styles/master.css"/>
     <link rel="stylesheet" href="styles/placeOrder.css"/>
     <link rel="icon" type="image/png" href="images/diamond.jpg"/>

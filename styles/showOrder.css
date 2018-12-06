@@ -1,0 +1,53 @@
+#content
+{
+    text-align: center;
+}
+
+.table
+{
+    display: table;
+    table-layout: fixed;
+    margin: auto;
+    color: black;
+    width: 50%;
+}
+
+.row
+{
+    display: table-row;
+}
+
+.cell
+{
+    display: table-cell;
+    padding: 10px;
+}
+
+.table a
+{
+    text-decoration: none;
+    color: black;
+    display: block;
+    margin: 0;
+}
+.table .name
+{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 500px;
+}
+
+.table .image
+{
+    height: 100px;
+    widht: 200px;
+}
+
+.table img
+{
+    max-width: 100px;
+    max-height: 100px;
+}
+
+

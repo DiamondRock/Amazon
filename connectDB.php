@@ -1,5 +1,5 @@
 <?php
-    require "db.php";
+    require_once "db.php";
 	$host = 'localhost';
 	$port = 3306;
 	$dbUsername = "root";
@@ -12,5 +12,6 @@
 	catch(PDOException $e)
     {
         $dbConnError = "Connection failed: ". $e->getMessage();
+        echo $e->getMessage();
     }
 ?>

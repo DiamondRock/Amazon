@@ -17,12 +17,6 @@
 		<li>
 			<a href="addProduct.php">Add New Product</a>
 		</li>
-        <li>
-            <a href="orderHistory.php">Order History</a>
-        </li>
-		<li>
-			<a href="contactUs.html">Contact Us</a>
-		</li>
 		<li>
 			<a href="logOut.php">Log Out</a>
 		</li>

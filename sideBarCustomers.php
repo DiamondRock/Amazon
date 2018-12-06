@@ -14,6 +14,9 @@
 		<li>
 			<a href="dashboardCustomers.php">Dashboard</a>
 		</li>
+        <li>
+            <a href="orderHistory.php">Order History</a>
+        </li>
 		<li>
 			<a href="aboutUs.php">About Us</a>
 		</li>
